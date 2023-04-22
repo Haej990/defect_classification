@@ -194,3 +194,30 @@ optimizer = torch.optim.Adam(params = model.parameters(), lr = CFG["LEARNING_RAT
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, threshold_mode='abs', min_lr=1e-8, verbose=True)
 
 infer_model = train(model, optimizer, train_loader, val_loader, scheduler, device)
+
+# Inference
+test = pd.read_csv('./test.csv')
+
+test_dataset = CustomDataset(test['img_path'].values, None, test_transform)
+test_loader = DataLoader(test_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=0)
+
+def inference(model, test_loader, device):
+    model.eval()
+    preds = []
+    with torch.no_grad():
+        for imgs in tqdm(iter(test_loader)):
+            imgs = imgs.float().to(device)
+
+            pred = model(imgs)
+
+            preds += pred.argmax(1).detach().cpu().numpy().tolist()
+
+    preds = le.inverse_transform(preds)
+    return preds
+
+preds = inference(infer_model, test_loader, device)
+
+
+submit = pd.read_csv('./sample_submission.csv')
+submit['label'] = preds
+submit.to_csv('./baseline_submit.csv', index=False)
