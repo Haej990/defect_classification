@@ -16,7 +16,7 @@ from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 import torchvision.models as models
-
+#TODO: search sklearn
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.metrics import f1_score
@@ -31,15 +31,15 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 #Hyperparameter Setting
 
 CFG = {
-    'IMG_SIZE':224,
-    'EPOCHS':10,
-    'LEARNING_RATE':3e-4,
-    'BATCH_SIZE':32,
-    'SEED':41
+    'IMG_SIZE':224, #H,W=224
+    'EPOCHS':10, # if use data augmentation, need to increase
+    'LEARNING_RATE':3e-4, 
+    'BATCH_SIZE':32, 
+    'SEED':41 
 }
 
 #Fixed RandomSeed
-
+# reproducibility 
 def seed_everything(seed):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -53,17 +53,17 @@ seed_everything(CFG['SEED']) # Seed 고정
 
 #Data Pre-processing
 
-all_img_list = glob.glob('./train/*/*')
+all_img_list = glob.glob('./train/*/*') #TODO: glob 찾아보기
 
 df = pd.DataFrame(columns=['img_path', 'label'])
 df['img_path'] = all_img_list
-df['label'] = df['img_path'].apply(lambda x : str(x).split('/')[2])
+df['label'] = df['img_path'].apply(lambda x : str(x).split('/')[2]) #TODO: lambda 찾아보기
 
-train, val, _, _ = train_test_split(df, df['label'], test_size=0.3, stratify=df['label'], random_state=CFG['SEED'])
+train, val, _, _ = train_test_split(df, df['label'], test_size=0.3, stratify=df['label'], random_state=CFG['SEED']) # split train, valid
 
 #Label-Encoding
 
-le = preprocessing.LabelEncoder()
+le = preprocessing.LabelEncoder() #label -> 숫자로 바꿔주는 과정
 train['label'] = le.fit_transform(train['label'])
 val['label'] = le.transform(val['label'])
 
@@ -76,12 +76,13 @@ class CustomDataset(Dataset):
         self.transforms = transforms
         
     def __getitem__(self, index):
-        img_path = self.img_path_list[index]
+        img_path = self.img_path_list[index] # image path == 파일 경로
         
-        image = cv2.imread(img_path)
+        image = cv2.imread(img_path) # cv2: opencv 라는 library 
+                                     # imread == imageread == 파일경로에서 이미지를 읽어서, 이걸 H x W x 3 으로 읽어옴
         
         if self.transforms is not None:
-            image = self.transforms(image=image)['image']
+            image = self.transforms(image=image)['image'] # 데이터 변환 (0-255 -> 0-1로 바꿈) 및 증강 (있으면) 진행
         
         if self.label_list is not None:
             label = self.label_list[index]
@@ -93,29 +94,33 @@ class CustomDataset(Dataset):
         return len(self.img_path_list)
 
 train_transform = A.Compose([
-                            A.Resize(CFG['IMG_SIZE'],CFG['IMG_SIZE']),
-                            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0, always_apply=False, p=1.0),
-                            ToTensorV2()
+                            A.Resize(CFG['IMG_SIZE'],CFG['IMG_SIZE']), # 다 244 244로 통일== 왜? 그래야 batchify 가 가능
+                            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0, always_apply=False, p=1.0), #0-255를 0-1로 바꾸는 과정 : 데이터셋에 맞춰서 변환해줌
+                            # TODO: data augmentation can come here
+                            ToTensorV2() #tensor == 딥러닝용 단어 matrix
+                            # TODO: or here
                             ])
 
-test_transform = A.Compose([
+test_transform = A.Compose([ # valid/test의 경우 data augmentation안해줌
                             A.Resize(CFG['IMG_SIZE'],CFG['IMG_SIZE']),
                             A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0, always_apply=False, p=1.0),
                             ToTensorV2()
                             ])
 
 train_dataset = CustomDataset(train['img_path'].values, train['label'].values, train_transform)
-train_loader = DataLoader(train_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=False, num_workers=0)
+train_loader = DataLoader(train_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=True, num_workers=0) #shuffle == 데이터 순서를 섞는다. 학습할 땐 True가 좋음
 
 val_dataset = CustomDataset(val['img_path'].values, val['label'].values, test_transform)
-val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=0)
+val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=0) 
 
 #Model Define
 class BaseModel(nn.Module):
     def __init__(self, num_classes=len(le.classes_)):
         super(BaseModel, self).__init__()
-        self.backbone = models.efficientnet_b2(pretrained=True)
-        self.classifier = nn.Linear(1000, num_classes)
+        self.backbone = models.efficientnet_b2(pretrained=True) # ImageNet pretrained
+                                                                 # #classes ==1000
+                                                                
+        self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
         
     def forward(self, x):
         x = self.backbone(x)
@@ -125,28 +130,31 @@ class BaseModel(nn.Module):
 #Train
 
 def train(model, optimizer, train_loader, val_loader, scheduler, device):
-    model.to(device)
-    criterion = nn.CrossEntropyLoss().to(device)
+    model.to(device) # send to GPU for training 
+    criterion = nn.CrossEntropyLoss().to(device) # # send to GPU for training 
     
     best_score = 0
     best_model = None
     
     for epoch in range(1, CFG['EPOCHS']+1):
-        model.train()
+        model.train() # train mode
         train_loss = []
-        for imgs, labels in tqdm(iter(train_loader)):
+        for imgs, labels in tqdm(iter(train_loader)): #img: input data, labels: ground truth output data
             imgs = imgs.float().to(device)
             labels = labels.to(device)
             
             optimizer.zero_grad()
             
-            output = model(imgs)
+            output = model(imgs) # prediction, [B, 19]
             loss = criterion(output, labels)
             
             loss.backward()
             optimizer.step()
             
             train_loss.append(loss.item())
+
+        # 1 epoch of training end
+        # validation begin
                     
         _val_loss, _val_score = validation(model, criterion, val_loader, device)
         _train_loss = np.mean(train_loss)
@@ -162,7 +170,7 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
     return best_model
 
 def validation(model, criterion, val_loader, device):
-    model.eval()
+    model.eval() # evaluation mode
     val_loss = []
     preds, true_labels = [], []
 
@@ -189,12 +197,14 @@ def validation(model, criterion, val_loader, device):
 #Run
 
 model = BaseModel()
-model.eval()
-optimizer = torch.optim.Adam(params = model.parameters(), lr = CFG["LEARNING_RATE"])
+
+optimizer = torch.optim.Adam(params = model.parameters(), lr = CFG["LEARNING_RATE"]) # Adam / AdamW / SGD
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, threshold_mode='abs', min_lr=1e-8, verbose=True)
+# 무조건 웬만하면 cosine annealing씀
 
 infer_model = train(model, optimizer, train_loader, val_loader, scheduler, device)
-
+#infer_model == best model == model with best validation performance
+###################################################################################
 # Inference
 test = pd.read_csv('./test.csv')
 
@@ -210,7 +220,7 @@ def inference(model, test_loader, device):
 
             pred = model(imgs)
 
-            preds += pred.argmax(1).detach().cpu().numpy().tolist()
+            preds += pred.argmax(1).detach().cpu().numpy().tolist() #argmax == max의 위치
 
     preds = le.inverse_transform(preds)
     return preds
