@@ -59,7 +59,7 @@ df = pd.DataFrame(columns=['img_path', 'label'])
 df['img_path'] = all_img_list
 df['label'] = df['img_path'].apply(lambda x : str(x).split('/')[2]) #TODO: lambda 찾아보기
 
-train, val, _, _ = train_test_split(df, df['label'], test_size=0.3, stratify=df['label'], random_state=CFG['SEED']) # split train, valid
+train, val, _, _ = train_test_split(df, df['label'], test_size=0.1, stratify=df['label'], random_state=CFG['SEED']) # split train, valid
 
 #Label-Encoding
 
@@ -117,7 +117,7 @@ val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False
 class BaseModel(nn.Module):
     def __init__(self, num_classes=len(le.classes_)):
         super(BaseModel, self).__init__()
-        self.backbone = models.efficientnet_b2(pretrained=True) # ImageNet pretrained
+        self.backbone = models.efficientnet_b0(pretrained=True) # ImageNet pretrained
                                                                  # #classes ==1000
                                                                 
         self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
