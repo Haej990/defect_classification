@@ -16,6 +16,7 @@ from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 import torchvision.models as models
+import timm
 #TODO: search sklearn
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
@@ -35,7 +36,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 #Hyperparameter Setting
 
 CFG = {
-    'IMG_SIZE':224, #H,W=224
+    'IMG_SIZE':260, #H,W=224
     'EPOCHS':20, # if use data augmentation, need to increase
     'LEARNING_RATE':3e-2, # When using SGD, use 10-100x higher learning rate 
     'BATCH_SIZE':128, 
@@ -145,14 +146,22 @@ val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False
 class BaseModel(nn.Module):
     def __init__(self, num_classes=len(le.classes_)):
         super(BaseModel, self).__init__()
-        self.backbone = models.efficientnet_b0(pretrained=True) # ImageNet pretrained
+        # self.backbone = models.efficientnet_b0(pretrained=True) # ImageNet pretrained
                                                                  # #classes ==1000
                                                                 
-        self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
+        # self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
+
+        self.model = timm.create_model('tf_efficientnet_b2_ap',pretrained=True,num_classes=num_classes)
+        # https://github.com/huggingface/pytorch-image-models/blob/326ade299983a1d72b0f4def1299da1bb0f6b6f2/results/results-imagenet.csv
+        # resnet~
+        # efficientnet~
+        # vit~
+
         
     def forward(self, x):
-        x = self.backbone(x)
-        x = self.classifier(x)
+        # x = self.backbone(x)
+        # x = self.classifier(x)
+        x = self.model(x)
         return x
 
 #Train
