@@ -34,7 +34,7 @@ CFG = {
     'IMG_SIZE':224, #H,W=224
     'EPOCHS':10, # if use data augmentation, need to increase
     'LEARNING_RATE':3e-4, 
-    'BATCH_SIZE':32, 
+    'BATCH_SIZE':128, 
     'SEED':41 
 }
 
@@ -79,11 +79,10 @@ val = val.append(to_move, ignore_index=True)
 train = train.drop(index=rows.index[0])
 
 # data balancing
-multiplier = {'훼손':1, '오염':2, '걸레받이수정':4, '꼬임':6, '터짐':7, '곰팡이':7, '오타공':7, '몰딩수정':7,'면불량':12, '석고수정':20, '들뜸':20, '피스':20, '창틀,문틀수정':45, '울음':45, '이음부불량':45, '녹오염':85, '가구수정':85, '반점':300, '틈새과다':300 } 
+multiplier = {'훼손':1, '오염':2, '걸레받이수정':4, '꼬임':6, '터짐':7, '곰팡이':7, '오타공':7, '몰딩수정':7,'면불량':12, '석고수정':20, '들뜸':20, '피스':20, '창틀,문틀수정':45, '울음':45, '이음부불량':70, '녹오염':85, '가구수정':85, '반점':600, '틈새과다':300 } 
 reps = [multiplier[v] for v in train.label] # TODO: list comprehension 
 train = train.loc[np.repeat(train.index.values, reps)]
 #Label-Encoding
-
 le = preprocessing.LabelEncoder() #label -> 숫자로 바꿔주는 과정
 train['label'] = le.fit_transform(train['label'])
 val['label'] = le.transform(val['label'])
@@ -129,10 +128,10 @@ test_transform = A.Compose([ # valid/test의 경우 data augmentation안해줌
                             ])
 
 train_dataset = CustomDataset(train['img_path'].values, train['label'].values, train_transform)
-train_loader = DataLoader(train_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=True, num_workers=0) #shuffle == 데이터 순서를 섞는다. 학습할 땐 True가 좋음
+train_loader = DataLoader(train_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=True, num_workers=16) #shuffle == 데이터 순서를 섞는다. 학습할 땐 True가 좋음
 
 val_dataset = CustomDataset(val['img_path'].values, val['label'].values, test_transform)
-val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=0) 
+val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=16) 
 
 #Model Define
 class BaseModel(nn.Module):
