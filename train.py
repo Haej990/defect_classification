@@ -125,6 +125,7 @@ train_transform = A.Compose([
                             A.Resize(CFG['IMG_SIZE'],CFG['IMG_SIZE']), # 다 244 244로 통일== 왜? 그래야 batchify 가 가능
                             #A.Rotate(),
                             A.ColorJitter(p=1.0),
+                            A.RandomRotate90(p=1.0),
                             A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0, always_apply=False, p=1.0), #0-255를 0-1로 바꾸는 과정 : 데이터셋에 맞춰서 변환해줌
                             # TODO: data augmentation can come here
                             ToTensorV2() #tensor == 딥러닝용 단어 matrix
