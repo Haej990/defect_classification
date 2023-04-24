@@ -61,22 +61,25 @@ df['label'] = df['img_path'].apply(lambda x : str(x).split('/')[2]) #TODO: lambd
 
 
 
-train, val, _, _ = train_test_split(df, df['label'], test_size=0.1, stratify=df['label'], random_state=CFG['SEED']) # split train, valid 
+train, val, _, _ = train_test_split(df, df['label'], test_size=0.3, stratify=df['label'], random_state=CFG['SEED']) # split train, valid 
                                                                                                                     # valid 고정 -> seed 고정 == randomness 고정
 
 # 반점 하나 옮기기
-cond0 = train.label == '반점'
-rows = train.loc[cond0]
-to_move = rows.iloc[0]
-val = val.append(to_move, ignore_index=True)
-train = train.drop(index=rows.index[0])
+if len(val.loc[val.label=='반점']) == 0:
+    cond0 = train.label == '반점'
+    rows = train.loc[cond0]
+    to_move = rows.iloc[0]
+    val = val.append(to_move, ignore_index=True)
+    train = train.drop(index=rows.index[0])
 
 # 틈새과다 하나 옮기기
-cond1 = train.label == '틈새과다'
-rows = train.loc[cond1]
-to_move = rows.iloc[0]
-val = val.append(to_move, ignore_index=True)
-train = train.drop(index=rows.index[0])
+
+if len(val.loc[val.label=='틈새과다']) == 0:
+    cond1 = train.label == '틈새과다'
+    rows = train.loc[cond1]
+    to_move = rows.iloc[0]
+    val = val.append(to_move, ignore_index=True)
+    train = train.drop(index=rows.index[0])
 
 # data balancing
 multiplier = {'훼손':1, '오염':2, '걸레받이수정':4, '꼬임':6, '터짐':7, '곰팡이':7, '오타공':7, '몰딩수정':7,'면불량':12, '석고수정':20, '들뜸':20, '피스':20, '창틀,문틀수정':45, '울음':45, '이음부불량':70, '녹오염':85, '가구수정':85, '반점':600, '틈새과다':300 } 
