@@ -36,7 +36,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 #Hyperparameter Setting
 
 CFG = {
-    'IMG_SIZE':260, #H,W=224
+    'IMG_SIZE':224, #H,W=224
     'EPOCHS':20, # if use data augmentation, need to increase
     'LEARNING_RATE':3e-2, # When using SGD, use 10-100x higher learning rate 
     'BATCH_SIZE':128, 
@@ -151,7 +151,7 @@ class BaseModel(nn.Module):
                                                                 
         # self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
 
-        self.model = timm.create_model('tf_efficientnet_b2_ap',pretrained=True,num_classes=num_classes)
+        self.model = timm.create_model('xcit_tiny_12_p8_224_dist',pretrained=True,num_classes=num_classes)
         # https://github.com/huggingface/pytorch-image-models/blob/326ade299983a1d72b0f4def1299da1bb0f6b6f2/results/results-imagenet.csv
         # resnet~
         # efficientnet~
