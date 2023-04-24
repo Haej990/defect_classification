@@ -26,6 +26,10 @@ from tqdm.auto import tqdm
 import warnings
 warnings.filterwarnings(action='ignore') 
 
+import wandb
+wandb.init(project="dacon_papering_defect_classification")
+wandb.run.log_code(".")
+
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 #Hyperparameter Setting
@@ -118,7 +122,7 @@ class CustomDataset(Dataset):
 
 train_transform = A.Compose([
                             A.Resize(CFG['IMG_SIZE'],CFG['IMG_SIZE']), # 다 244 244로 통일== 왜? 그래야 batchify 가 가능
-                            A.Rotate(),
+                            #A.Rotate(),
                             A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0, always_apply=False, p=1.0), #0-255를 0-1로 바꾸는 과정 : 데이터셋에 맞춰서 변환해줌
                             # TODO: data augmentation can come here
                             ToTensorV2() #tensor == 딥러닝용 단어 matrix
@@ -183,7 +187,7 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
         _val_loss, _val_score = validation(model, criterion, val_loader, device)
         _train_loss = np.mean(train_loss)
         print(f'Epoch [{epoch}], Train Loss : [{_train_loss:.5f}] Val Loss : [{_val_loss:.5f}] Val Weighted F1 Score : [{_val_score:.5f}]')
-       
+        wandb.log({'train_loss': _train_loss, 'val_loss': _val_loss, 'val_f1_score': _val_score})
         if scheduler is not None:
             scheduler.step(_val_score)
             
