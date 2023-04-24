@@ -2,3 +2,5 @@ train/
 train/*
 test/
 test/*
+wandb/
+wandb/*
