@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 import re
-import glob
+import glob 
 import cv2
 
 import torch
@@ -53,13 +53,30 @@ seed_everything(CFG['SEED']) # Seed 고정
 
 #Data Pre-processing
 
-all_img_list = glob.glob('./train/*/*') #TODO: glob 찾아보기
+all_img_list = glob.glob('./train/*/*') #glob == 파일 경로 불러오기 
 
 df = pd.DataFrame(columns=['img_path', 'label'])
 df['img_path'] = all_img_list
 df['label'] = df['img_path'].apply(lambda x : str(x).split('/')[2]) #TODO: lambda 찾아보기
 
-train, val, _, _ = train_test_split(df, df['label'], test_size=0.1, stratify=df['label'], random_state=CFG['SEED']) # split train, valid
+
+
+train, val, _, _ = train_test_split(df, df['label'], test_size=0.1, stratify=df['label'], random_state=CFG['SEED']) # split train, valid 
+                                                                                                                    # valid 고정 -> seed 고정 == randomness 고정
+
+# 반점 하나 옮기기
+cond0 = train.label == '반점'
+rows = train.loc[cond0]
+to_move = rows.iloc[0]
+val = val.append(to_move, ignore_index=True)
+train = train.drop(index=rows.index[0])
+
+# 틈새과다 하나 옮기기
+cond1 = train.label == '틈새과다'
+rows = train.loc[cond1]
+to_move = rows.iloc[0]
+val = val.append(to_move, ignore_index=True)
+train = train.drop(index=rows.index[0])
 
 #Label-Encoding
 
