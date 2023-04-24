@@ -78,6 +78,10 @@ to_move = rows.iloc[0]
 val = val.append(to_move, ignore_index=True)
 train = train.drop(index=rows.index[0])
 
+# data balancing
+multiplier = {'훼손':1, '오염':2, '걸레받이수정':4, '꼬임':6, '터짐':7, '곰팡이':7, '오타공':7, '몰딩수정':7,'면불량':12, '석고수정':20, '들뜸':20, '피스':20, '창틀,문틀수정':45, '울음':45, '이음부불량':45, '녹오염':85, '가구수정':85, '반점':300, '틈새과다':300 } 
+reps = [multiplier[v] for v in train.label] # TODO: list comprehension 
+train = train.loc[np.repeat(train.index.values, reps)]
 #Label-Encoding
 
 le = preprocessing.LabelEncoder() #label -> 숫자로 바꿔주는 과정
