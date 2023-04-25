@@ -67,7 +67,7 @@ df['label'] = df['img_path'].apply(lambda x : str(x).split('/')[2]) #TODO: lambd
 
 
 
-train, val, _, _ = train_test_split(df, df['label'], test_size=0.1, stratify=df['label'], random_state=CFG['SEED']) # split train, valid 
+train, val, _, _ = train_test_split(df, df['label'], test_size=0.3, stratify=df['label'], random_state=CFG['SEED']) # split train, valid 
                                                                                                                     # valid 고정 -> seed 고정 == randomness 고정
 
 # 반점 하나 옮기기
