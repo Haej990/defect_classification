@@ -41,8 +41,8 @@ CFG = {
     'IMG_SIZE':224, #H,W=224
     'EPOCHS':20, # if use data augmentation, need to increase
     'LEARNING_RATE':3e-2, # When using SGD, use 10-100x higher learning rate 
-    'BATCH_SIZE':128, 
-    'SEED':42 
+    'BATCH_SIZE':64, 
+    'SEED':41 
 }
 
 #Fixed RandomSeed
@@ -156,7 +156,7 @@ class BaseModel(nn.Module):
                                                                 
         # self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
 
-        self.model = timm.create_model('tf_efficientnet_b0_ns',pretrained=True,num_classes=num_classes)
+        self.model = timm.create_model('tf_efficientnet_b5_ns',pretrained=True,num_classes=num_classes)
         # https://github.com/huggingface/pytorch-image-models/blob/326ade299983a1d72b0f4def1299da1bb0f6b6f2/results/results-imagenet.csv
         # resnet~
         # efficientnet~
