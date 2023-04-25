@@ -31,6 +31,7 @@ warnings.filterwarnings(action='ignore')
 import wandb
 wandb.init(project="dacon_papering_defect_classification")
 wandb.run.log_code(".")
+wandb.save("./baseline_submit.csv", policy="end")
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -41,7 +42,7 @@ CFG = {
     'EPOCHS':20, # if use data augmentation, need to increase
     'LEARNING_RATE':3e-2, # When using SGD, use 10-100x higher learning rate 
     'BATCH_SIZE':128, 
-    'SEED':2023 
+    'SEED':42 
 }
 
 #Fixed RandomSeed
@@ -274,4 +275,3 @@ preds = inference(infer_model, test_loader, device)
 submit = pd.read_csv('./sample_submission.csv')
 submit['label'] = preds
 submit.to_csv('./baseline_submit.csv', index=False)
-wandb.save('baseline_submit.csv')
