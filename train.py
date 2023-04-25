@@ -154,7 +154,7 @@ class BaseModel(nn.Module):
                                                                 
         # self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
 
-        self.model = timm.create_model('xcit_nano_12_p8_224',pretrained=True,num_classes=num_classes)
+        self.model = timm.create_model('mobilenetv2_100',pretrained=True,num_classes=num_classes)
         # https://github.com/huggingface/pytorch-image-models/blob/326ade299983a1d72b0f4def1299da1bb0f6b6f2/results/results-imagenet.csv
         # resnet~
         # efficientnet~
