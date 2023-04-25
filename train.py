@@ -229,7 +229,7 @@ def validation(model, criterion, val_loader, device):
         
         _val_loss = np.mean(val_loss)
         _val_score = f1_score(true_labels, preds, average='weighted')
-        print(classification_report(true_labels, preds))
+        print( classification_report(true_labels, preds, target_names=le.inverse_transform([i for i in range(19)])))
     
     return _val_loss, _val_score
 
