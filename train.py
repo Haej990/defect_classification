@@ -22,6 +22,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
 from tqdm.auto import tqdm
 
 import warnings
@@ -229,6 +230,7 @@ def validation(model, criterion, val_loader, device):
         
         _val_loss = np.mean(val_loss)
         _val_score = f1_score(true_labels, preds, average='weighted')
+        print(confusion_matrix(true_labels, preds))
         print( classification_report(true_labels, preds, target_names=le.inverse_transform([i for i in range(19)])))
     
     return _val_loss, _val_score
