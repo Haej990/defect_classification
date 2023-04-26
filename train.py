@@ -133,6 +133,7 @@ train_transform = A.Compose([
                             # TODO: data augmentation can come here
                             ToTensorV2() #tensor == 딥러닝용 단어 matrix
                             # TODO: or here
+                            ])
                             
 
 test_transform = A.Compose([ # valid/test의 경우 data augmentation안해줌
