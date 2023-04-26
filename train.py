@@ -133,7 +133,7 @@ train_transform = A.Compose([
                             # TODO: data augmentation can come here
                             ToTensorV2() #tensor == 딥러닝용 단어 matrix
                             # TODO: or here
-                            ])
+                            
 
 test_transform = A.Compose([ # valid/test의 경우 data augmentation안해줌
                             A.Resize(CFG['IMG_SIZE'],CFG['IMG_SIZE']),
@@ -156,7 +156,7 @@ class BaseModel(nn.Module):
                                                                 
         # self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
 
-        self.model = timm.create_model('tf_efficientnet_b5_ns',pretrained=True,num_classes=num_classes)
+        self.model = timm.create_model('tf_efficientnet_b3_ns',pretrained=True,num_classes=num_classes)
         # https://github.com/huggingface/pytorch-image-models/blob/326ade299983a1d72b0f4def1299da1bb0f6b6f2/results/results-imagenet.csv
         # resnet~
         # efficientnet~
