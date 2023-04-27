@@ -42,8 +42,8 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 #Hyperparameter Setting
 CFG = {
     'IMG_SIZE':224, #H,W=224
-    'EPOCHS':30, # if use data augmentation, need to increase
-    'LEARNING_RATE':3e-2, # When using SGD, use 10-100x higher learning rate 
+    'EPOCHS':20, # if use data augmentation, need to increase
+    'LEARNING_RATE':3e-4, # When using SGD, use 10-100x higher learning rate 
     'BATCH_SIZE':64, 
     'SEED':41 
 }
@@ -132,7 +132,7 @@ if __name__=="__main__":
     # model
     model = BaseModel(le)
 
-    optimizer = torch.optim.SGD(params = model.parameters(), lr = CFG["LEARNING_RATE"]) # Adam / AdamW / SGD
+    optimizer = torch.optim.AdamW(params = model.parameters(), lr = CFG["LEARNING_RATE"]) # Adam / AdamW / SGD
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, threshold_mode='abs', min_lr=1e-8, verbose=True)
     # 무조건 웬만하면 cosine annealing씀
 
