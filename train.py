@@ -128,7 +128,7 @@ def validation(model, criterion, val_loader, device):
 model = BaseModel()
 
 # get dataloader for train/valid
-train_loader, val_loader = get_loader()
+train_loader, val_loader = get_loader(CFG)
 
 optimizer = torch.optim.SGD(params = model.parameters(), lr = CFG["LEARNING_RATE"]) # Adam / AdamW / SGD
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, threshold_mode='abs', min_lr=1e-8, verbose=True)

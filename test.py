@@ -29,14 +29,16 @@ import warnings
 warnings.filterwarnings(action='ignore') 
 
 import wandb
-from data import CustomDataset
+from data import CustomDataset, get_transforms
 from model import BaseModel
+from train import CFG
+
 
 # Inference
 test = pd.read_csv('./test.csv')
-
+_, test_transform = get_transforms(CFG)
 test_dataset = CustomDataset(test['img_path'].values, None, test_transform)
-test_loader = DataLoader(test_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=16)
+test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=16)
 
 def inference(model, test_loader, device):
     model.eval()
