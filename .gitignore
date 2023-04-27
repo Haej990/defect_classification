@@ -3,4 +3,5 @@ train/*
 test/
 test/*
 wandb/
-wandb/*
+wandb/
+*.pt*

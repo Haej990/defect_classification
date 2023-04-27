@@ -29,14 +29,16 @@ import warnings
 warnings.filterwarnings(action='ignore') 
 
 import wandb
-from data import CustomDataset, get_transforms
+from data import CustomDataset, get_transforms, get_loader
 from model import BaseModel
 from train import CFG
 
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 # Inference
 test = pd.read_csv('./test.csv')
 _, test_transform = get_transforms(CFG)
+_,_,le = get_loader(CFG)
 test_dataset = CustomDataset(test['img_path'].values, None, test_transform)
 test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=16)
 
@@ -55,9 +57,10 @@ def inference(model, test_loader, device):
     return preds
 
 # load model
-infer_model = BaseModel()
+infer_model = BaseModel(le)
 infer_model.load_state_dict(torch.load("best_val_f1_model.pt"))
 infer_model.eval()
+infer_model.to(device)
 
 preds = inference(infer_model, test_loader, device)
 
