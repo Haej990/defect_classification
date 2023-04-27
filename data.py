@@ -130,4 +130,4 @@ def get_loader(CFG):
     val_dataset = CustomDataset(val['img_path'].values, val['label'].values, test_transform)
     val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=16) 
 
-    return train_loader, val_loader
+    return train_loader, val_loader, le

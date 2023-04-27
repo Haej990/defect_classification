@@ -32,14 +32,10 @@ import wandb
 
 #Model Define
 class BaseModel(nn.Module):
-    def __init__(self, num_classes=len(le.classes_), model_name="tf_efficientnet_b3_ns"):
+    def __init__(self, le=le, model_name="tf_efficientnet_b3_ns"):
         super(BaseModel, self).__init__()
-        # self.backbone = models.efficientnet_b0(pretrained=True) # ImageNet pretrained
-                                                                 # #classes ==1000
-                                                                
-        # self.classifier = nn.Linear(1000, num_classes) # 1000 -> 19
 
-        self.model = timm.create_model(model_name,pretrained=True,num_classes=num_classes)
+        self.model = timm.create_model(model_name,pretrained=True,num_classes=len(le.classes_))
         # https://github.com/huggingface/pytorch-image-models/blob/326ade299983a1d72b0f4def1299da1bb0f6b6f2/results/results-imagenet.csv
         # resnet~
         # efficientnet~
