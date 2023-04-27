@@ -64,7 +64,7 @@ def get_transforms(CFG):
                             #A.Rotate(),
                             A.ColorJitter(p=1.0),
                             A.RandomRotate90(p=1.0),
-                            A.Affine (scale=(0.8,1.2), translate_percent=(0.0,0.3), shear=[-45,45]),
+                            A.Affine (scale=(0.6,1.3), translate_percent=(0.0,0.3), shear=[-45,45]),
                             #A.AdvancedBlur(),
                             A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0, always_apply=False, p=1.0), #0-255를 0-1로 바꾸는 과정 : 데이터셋에 맞춰서 변환해줌
                             # TODO: data augmentation can come here
