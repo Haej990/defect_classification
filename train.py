@@ -54,7 +54,7 @@ seed_everything(CFG['SEED']) # Seed 고정
 #Train
 def train(model, optimizer, train_loader, val_loader, scheduler, device):
     model.to(device) # send to GPU for training 
-    criterion = nn.CrossEntropyLoss(label_smoothing=0.1).to(device) # # send to GPU for training 
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.0).to(device) # # send to GPU for training 
     
     best_score = 0
     best_loss = 10000000
@@ -76,6 +76,9 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
             
             train_loss.append(loss.item())
 
+            if scheduler is not None:
+                scheduler.step()
+
         # 1 epoch of training end
         # validation begin
                     
@@ -83,8 +86,6 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
         _train_loss = np.mean(train_loss)
         print(f'Epoch [{epoch}], Train Loss : [{_train_loss:.5f}] Val Loss : [{_val_loss:.5f}] Val Weighted F1 Score : [{_val_score:.5f}]')
         wandb.log({'train_loss': _train_loss, 'val_loss': _val_loss, 'val_f1_score': _val_score})
-        if scheduler is not None:
-            scheduler.step(_val_score)
             
         if best_score < _val_score:
             best_score = _val_score
@@ -133,7 +134,7 @@ if __name__=="__main__":
     model = BaseModel(le)
 
     optimizer = torch.optim.SGD(params = model.parameters(), lr = CFG["LEARNING_RATE"]) # Adam / AdamW / SGD
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, threshold_mode='abs', min_lr=1e-8, verbose=True)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max = len(dataloader)*CFG['EPOCHS'], verbose = True)
     # 무조건 웬만하면 cosine annealing씀
 
     train(model, optimizer, train_loader, val_loader, scheduler, device)
