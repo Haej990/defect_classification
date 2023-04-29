@@ -134,7 +134,7 @@ if __name__=="__main__":
     model = BaseModel(le)
 
     optimizer = torch.optim.SGD(params = model.parameters(), lr = CFG["LEARNING_RATE"]) # Adam / AdamW / SGD
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max = len(dataloader)*CFG['EPOCHS'], verbose = True)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max = len(train_loader)*CFG['EPOCHS'], verbose = True)
     # 무조건 웬만하면 cosine annealing씀
 
     train(model, optimizer, train_loader, val_loader, scheduler, device)
