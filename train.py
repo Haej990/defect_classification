@@ -54,7 +54,7 @@ seed_everything(CFG['SEED']) # Seed 고정
 #Train
 def train(model, optimizer, train_loader, val_loader, scheduler, device):
     model.to(device) # send to GPU for training 
-    criterion = nn.CrossEntropyLoss(label_smoothing=0.5).to(device) # # send to GPU for training 
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.1).to(device) # # send to GPU for training 
     
     best_score = 0
     best_loss = 10000000
