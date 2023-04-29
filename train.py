@@ -43,7 +43,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 CFG = {
     'IMG_SIZE':300, #H,W=224
     'EPOCHS':20, # if use data augmentation, need to increase
-    'LEARNING_RATE':1e-1, # When using SGD, use 10-100x higher learning rate 
+    'LEARNING_RATE':1e-2, # When using SGD, use 10-100x higher learning rate 
     'BATCH_SIZE':64, 
     'SEED':41 
 }
@@ -62,7 +62,7 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
     for epoch in range(1, CFG['EPOCHS']+1):
         model.train() # train mode
         train_loss = []
-        for imgs, labels in tqdm(iter(train_loader)): #img: input data, labels: ground truth output data
+        for imgs, labels in tqdm(iter(train_loader)): #img: input data, labels: ground truth output data #tqdm : 진행바
             imgs = imgs.float().to(device)
             labels = labels.to(device)
             
