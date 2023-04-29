@@ -43,7 +43,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 CFG = {
     'IMG_SIZE':300, #H,W=224
     'EPOCHS':20, # if use data augmentation, need to increase
-    'LEARNING_RATE':3e-2, # When using SGD, use 10-100x higher learning rate 
+    'LEARNING_RATE':1e-1, # When using SGD, use 10-100x higher learning rate 
     'BATCH_SIZE':64, 
     'SEED':41 
 }
