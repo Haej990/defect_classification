@@ -41,7 +41,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 
 #Hyperparameter Setting
 CFG = {
-    'IMG_SIZE':300, #H,W=224
+    'IMG_SIZE':384, #H,W=224
     'EPOCHS':20, # if use data augmentation, need to increase
     'LEARNING_RATE':1e-2, # When using SGD, use 10-100x higher learning rate 
     'BATCH_SIZE':64, 

@@ -32,7 +32,7 @@ import wandb
 
 #Model Define
 class BaseModel(nn.Module):
-    def __init__(self, le, model_name="tf_efficientnet_b3_ns"):
+    def __init__(self, le, model_name="convnext_small_384_in22ft1k"):
         super(BaseModel, self).__init__()
 
         self.model = timm.create_model(model_name,pretrained=True,num_classes=len(le.classes_))
