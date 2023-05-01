@@ -62,6 +62,9 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
     # dog 100
     # cat 10
     # 1:10
+
+    #list to tensor
+    class_weight = torch.FloatTensor(class_weight)
     
     criterion = nn.CrossEntropyLoss(weight = class_weight).to(device) # # send to GPU for training 
     
