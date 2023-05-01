@@ -58,7 +58,7 @@ def inference(model, test_loader, device):
 
 # load model
 infer_model = BaseModel(le)
-infer_model.load_state_dict(torch.load("best_val_loss_model.pt"))
+infer_model.load_state_dict(torch.load("best_val_f1_model.pt"))
 infer_model.eval()
 infer_model.to(device)
 
