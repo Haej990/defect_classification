@@ -53,8 +53,17 @@ seed_everything(CFG['SEED']) # Seed 고정
 
 #Train
 def train(model, optimizer, train_loader, val_loader, scheduler, device):
-    model.to(device) # send to GPU for training 
-    criterion = nn.CrossEntropyLoss(label_smoothing=0.0).to(device) # # send to GPU for training 
+    model.to(device) # send to GPU for training
+    class_weight = [1.0] * 19 
+    classes_with_small_number = [0,4,8,12,13,14,16]# 0 4 8 12 13 14 16
+    for c in classes_with_small_number:
+        class_weight[c] = 3.0
+
+    # dog 100
+    # cat 10
+    # 1:10
+    
+    criterion = nn.CrossEntropyLoss(weight = class_weight).to(device) # # send to GPU for training 
     
     best_score = 0
     best_loss = 10000000
